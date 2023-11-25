@@ -274,25 +274,23 @@ impl Sqids {
         chars
     }
 
-    fn is_blocked_id(&self, id: &str) -> bool {
-        let id = id.to_lowercase();
+	fn is_blocked_id(&self, id: &str) -> bool {
+		let id = id.to_lowercase();
+		let id_len = id.len();
 
-        for word in &self.blocklist {
-            if word.len() <= id.len() {
-                if id.len() <= 3 || word.len() <= 3 {
-                    if id == *word {
-                        return true;
-                    }
-                } else if word.chars().any(|c| c.is_ascii_digit()) {
-                    if id.starts_with(word) || id.ends_with(word) {
-                        return true;
-                    }
-                } else if id.contains(word) {
-                    return true;
-                }
-            }
-        }
+		self.blocklist.iter().any(|word| {
+			let word = word.to_lowercase();
+			let word_len = word.len();
 
-        false
-    }
+			if word_len > id_len {
+				false
+			} else if id_len <= 3 || word_len <= 3 {
+				id == word
+			} else if word.chars().any(|c| c.is_ascii_digit()) {
+				id.starts_with(&word) || id.ends_with(&word)
+			} else {
+				id.contains(&word)
+			}
+		})
+	}
 }
